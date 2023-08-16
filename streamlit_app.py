@@ -250,13 +250,9 @@ def main():
         st.session_state["show_named_entities"] = show_entities
 
     print("main")
-    data2 = load_data()
-    # print(URL_selected_sources)
 
     data = fetch(category)
-    save_to_file(data2)
     simple_view(data['articles'])
-
 
 if __name__ == "__main__":
     main()
