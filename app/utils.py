@@ -1,9 +1,9 @@
 import re
 import spacy
 
-nlp = spacy.load("en_core_web_lg")
+nlp = spacy.load("en_core_web_md")
 
-# print("spacy version:", spacy.__version__)
+print("spacy version:", spacy.__version__)
 
 
 def strip_html(text):

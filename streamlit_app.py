@@ -43,10 +43,13 @@ def how_long_ago(utc_datetime_string):
     t1 = todays_date_in_epoch_time()
     t_diff = t1 - t0
 
+    d = int(t_diff / (3600 * 24))
     h = int(t_diff / 3600)
     m = int(t_diff % 3600)
 
-    if h != 0:
+    if d > 0:
+        phrase = f"{d}d ago"
+    elif h > 0:
         phrase = f"{h}h ago"
     else:
         phrase = f"{m}m ago"
@@ -92,7 +95,7 @@ class URLs:
     TOP_HEADLINES = f"https://newsapi.org/v2/top-headlines?country={COUNTRY_CODE}&apiKey={API_KEY}"
 
 
-@st.cache_data(ttl=3600, show_spinner="Thinking...")
+@st.cache_data(ttl=14_000, show_spinner="Thinking...")
 def fetch(category):
     print("fetch")
 
@@ -100,10 +103,13 @@ def fetch(category):
 
     response = requests.get(url)
 
+    data = {}
+
     if response.status_code == 200:
         # st.write(response.json())
         data = response.json()
     else:
+       # TODO Raise/Throw Exception
         st.error(f"status_code: {response.status_code}")
 
     return data
@@ -127,10 +133,11 @@ def display(article):
         if article['description'] is not None:
             if st.session_state['show_named_entities']:
                 prepared = app.utils.prepare_text(article['description'])
+                pp.pprint(prepared)
                 annotated_text(prepared)
             else:
                 # st.write(article['description'])
-                st.markdown(article['description'], unsafe_allow_html=True)
+                st.markdown(f"<p>{article['description']}</p>", unsafe_allow_html=True)
 
 
 def search_form():
@@ -191,18 +198,6 @@ def view(articles):
         st.divider()
 
 
-@st.cache_data
-def load_data():
-    print("load_data")
-    with open("headlines.json", "r") as f:
-        data = json.load(f)
-    return data
-
-
-def save_to_file(data):
-    with open("top-headlines.json", "w") as f:
-        json.dump(data, f, indent=4)
-
 
 EMOJI_NEWSPAPER = "\U0001F4F0"
 
@@ -252,7 +247,12 @@ def main():
     print("main")
 
     data = fetch(category)
-    simple_view(data['articles'])
+
+    if 'articles' in data:
+        simple_view(data['articles'])
+    else:
+        print("No articles returned")
+
 
 if __name__ == "__main__":
     main()
