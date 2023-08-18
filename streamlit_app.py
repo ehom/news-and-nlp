@@ -109,7 +109,7 @@ def fetch(category):
         # st.write(response.json())
         data = response.json()
     else:
-       # TODO Raise/Throw Exception
+        # TODO Raise/Throw Exception
         st.error(f"status_code: {response.status_code}")
 
     return data
@@ -154,10 +154,10 @@ def search_form():
             pp.pprint(fetched_data)
 
 
-def simple_view(articles):
+def simple_view(category, articles):
     count = len(articles)
 
-    st.title(f"Headlines ({count})")
+    st.title(f"{category} Headlines ({count})")
     st.write(todays_date())
 
     # st.divider()
@@ -198,7 +198,6 @@ def view(articles):
         st.divider()
 
 
-
 EMOJI_NEWSPAPER = "\U0001F4F0"
 
 categories = [
@@ -212,44 +211,27 @@ categories = [
 ]
 
 dict_of_categories = {category.title(): category for category in categories}
-# pp.pprint(dict_of_categories)
 
 
 def main():
-    print("streamlit: ", st.__version__)
+    print("main")
 
     st.set_page_config("Headlines", page_icon=EMOJI_NEWSPAPER)
 
     if "show_named_entities" not in st.session_state:
         st.session_state["show_named_entities"] = False
 
-    # sources = fetch(URL_SOURCES)['articles']
-    # pp.pprint(sources)
-    # dict_of_sources = {item['source']['name']:item['source']['id'] for item in sources if item['source']['id'] is not None}
-    # print("dict of sources")
-    # pp.pprint(dict_of_sources)
-
     with st.sidebar:
-        category = st.radio("Categories:", dict_of_categories.keys(), index=4)
-        category = dict_of_categories[category]
-
-        # multi_selections = st.multiselect("Choose sources:", dict_of_sources.keys(), dict_of_sources.keys())
-        # pp.pprint(multi_selections)
-
-        # list_of_sources = [ dict_of_sources[key] for key in multi_selections ]
-        # s = ','.join(list_of_sources)
-        # print("url source param:", s)
-        # URL_selected_sources = f"https://newsapi.org/v2/top-headlines?sources={s}&apiKey={API_KEY}"
+        category_display_name = st.radio("Categories:", dict_of_categories.keys(), index=4, key="categories")
+        category_key = dict_of_categories[category_display_name]
 
         show_entities = st.checkbox('Show Named Entities')
         st.session_state["show_named_entities"] = show_entities
 
-    print("main")
-
-    data = fetch(category)
+    data = fetch(category_key)
 
     if 'articles' in data:
-        simple_view(data['articles'])
+        simple_view(category_display_name, data['articles'])
     else:
         print("No articles returned")
 
