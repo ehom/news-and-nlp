@@ -1,5 +1,6 @@
 spacy>=3.6.0,<3.7.0
 streamlit
+spacy-streamlit>=1.0.0rc1,<1.1.0
 st-annotated-text
 en-core-web-md @ https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.6.0/en_core_web_md-3.6.0-py3-none-any.whl
 en-core-web-lg @ https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-3.6.0/en_core_web_lg-3.6.0-py3-none-any.whl
