@@ -5,9 +5,31 @@ from datetime import datetime, timezone, timedelta
 import streamlit as st
 from annotated_text import annotated_text
 import app.utils
+import pipelines
 
 from pprint import PrettyPrinter
 pp = PrettyPrinter(indent=4, width=80)
+
+
+class Emojis:
+    SAD = "\U0001F641"
+    HAPPY = "\U0001F642"
+    NEUTRAL = "\U0001F610"
+
+
+def mood(text):
+    predictions = pipelines.sentiment_analysis(text)
+    prediction, *_ = predictions
+
+    print(prediction)
+
+    if prediction['label'] == "NEGATIVE":
+        expression = Emojis.SAD
+    elif prediction['label'] == "POSITIVE":
+        expression = Emojis.HAPPY
+    else:
+        expression = Emojis.NEUTRAL
+    return expression
 
 
 def convert_utc_to_local_datetime(utc_datetime_string):
@@ -116,6 +138,8 @@ def fetch(category):
 
 
 def display(article):
+    pp.pprint(article)
+
     left_col, mid_col, right_col = st.columns([2, 1, 5])
 
     with left_col:
@@ -128,16 +152,21 @@ def display(article):
             prepared = app.utils.prepare_text(article['title'])
             annotated_text(prepared)
         else:
-            st.markdown(f"[{article['title']}]({article['url']})")
+            st.markdown(f"<p><a href={article['url']}>{article['title']}</a></p>", unsafe_allow_html=True)
 
         if article['description'] is not None:
             if st.session_state['show_named_entities']:
-                prepared = app.utils.prepare_text(article['description'])
-                pp.pprint(prepared)
-                annotated_text(prepared)
+                # prepared = app.utils.prepare_text(article['description'])
+                # pp.pprint(prepared)
+                # annotated_text(prepared)
+                print("description:", article['description'])
+                app.utils.visualize_entities(article['description'])
             else:
                 # st.write(article['description'])
                 st.markdown(f"<p>{article['description']}</p>", unsafe_allow_html=True)
+
+            expression = mood(article['description'])
+            st.markdown(f'<p style="font-size:24px">{expression}</p>', unsafe_allow_html=True)
 
 
 def search_form():
