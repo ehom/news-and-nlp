@@ -1,9 +1,25 @@
 import re
 import spacy
+from spacy_streamlit import visualize_ner
 
 nlp = spacy.load("en_core_web_md")
 
 print("spacy version:", spacy.__version__)
+
+
+key = 0
+
+def next_key():
+    global key
+    key = key + 1
+    return key
+
+
+def visualize_entities(text):
+    print("text:", text)
+    doc = nlp(text)
+    print("doc:", doc)
+    visualize_ner(doc, labels=nlp.get_pipe("ner").labels, title=None, show_table=False, key=str(next_key()))
 
 
 def strip_html(text):
